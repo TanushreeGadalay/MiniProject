@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy Birthday, AAI 💗</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg1:#ffe3ec;
+    --bg2:#fff3e6;
+    --envelope-back:#fff8f0;
+    --envelope-flap:#ff8fab;
+    --envelope-flap-dark:#ff6f9c;
+    --accent:#ff5c8a;
+    --gold:#f4c95d;
+    --plum:#6b2c4c;
+    --card-bg:#fffdfb;
+    --card-border:#ffd6e3;
+  }
+
+  *{ box-sizing:border-box; }
+
+  html,body{
+    margin:0;
+    height:100%;
+    font-family:'Quicksand', sans-serif;
+    background:
+      radial-gradient(circle at 15% 20%, #ffd9e6 0%, transparent 45%),
+      radial-gradient(circle at 85% 80%, #ffe8cf 0%, transparent 45%),
+      linear-gradient(160deg, var(--bg1), var(--bg2));
+    color:var(--plum);
+    overflow:hidden;
+  }
+
+  .scene{
+    position:relative;
+    width:100%;
+    height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+
+  /* ---------- Ambient floating decorations ---------- */
+  .floaties{
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    overflow:hidden;
+    z-index:1;
+  }
+  .floaty{
+    position:absolute;
+    font-size:22px;
+    opacity:0.75;
+    animation: drift linear infinite;
+    will-change:transform;
+  }
+  @keyframes drift{
+    0%   { transform: translateY(110vh) rotate(0deg); opacity:0; }
+    10%  { opacity:0.8; }
+    90%  { opacity:0.8; }
+    100% { transform: translateY(-10vh) rotate(360deg); opacity:0; }
+  }
+
+  /* ---------- Envelope view ---------- */
+  .envelope-wrap{
+    position:relative;
+    z-index:2;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:22px;
+    transition: opacity .5s ease, transform .5s ease;
+  }
+  .envelope-wrap.hidden{
+    opacity:0;
+    transform:scale(.9);
+    pointer-events:none;
+  }
+
+  .prompt{
+    font-family:'Caveat', cursive;
+    font-size:clamp(22px,4vw,30px);
+    color:var(--accent);
+    margin:0;
+    text-align:center;
+  }
+
+  .envelope{
+    position:relative;
+    width:min(340px, 82vw);
+    height:min(220px, 52vw);
+    perspective:1000px;
+  }
+
+  .envelope-body{
+    position:absolute;
+    inset:0;
+    background:var(--envelope-back);
+    border-radius:12px;
+    border:2px solid var(--card-border);
+    box-shadow:0 25px 45px -15px rgba(107,44,76,.35);
+  }
+
+  .envelope-pocket{
+    position:absolute;
+    left:0; right:0; bottom:0;
+    height:68%;
+    background:linear-gradient(135deg,#ffffff, var(--envelope-back));
+    clip-path:polygon(0 0, 50% 58%, 100% 0, 100% 100%, 0 100%);
+    border-top:2px solid var(--card-border);
+    border-radius:0 0 12px 12px;
+    z-index:2;
+  }
+
+  .envelope-flap{
+    position:absolute;
+    top:0; left:0; right:0;
+    height:62%;
+    background:linear-gradient(160deg, var(--envelope-flap), var(--envelope-flap-dark));
+    clip-path:polygon(0 0, 100% 0, 50% 100%);
+    transform-origin:top center;
+    transition:transform .9s cubic-bezier(.62,-0.25,.4,1.3);
+    z-index:3;
+    border-radius:12px 12px 0 0;
+  }
+
+  .envelope.open .envelope-flap{
+    transform:rotateX(178deg);
+    z-index:1;
+  }
+
+  .seal{
+    position:absolute;
+    top:50%; left:50%;
+    transform:translate(-50%,-50%);
+    width:60px; height:60px;
+    border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #fff6da, var(--gold));
+    border:3px solid #fff;
+    color:#fff;
+    font-size:26px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    z-index:4;
+    box-shadow:0 8px 18px rgba(244,201,93,.55);
+    animation:pulse 2.2s ease-in-out infinite;
+  }
+  .seal:hover{ filter:brightness(1.05); }
+  .seal:focus-visible{ outline:3px solid var(--accent); outline-offset:3px; }
+
+  @keyframes pulse{
+    0%,100%{ transform:translate(-50%,-50%) scale(1); }
+    50%{ transform:translate(-50%,-50%) scale(1.08); }
+  }
+
+  /* ---------- Card overlay ---------- */
+  .card-overlay{
+    position:fixed;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+    background:rgba(107,44,76,0.28);
+    backdrop-filter:blur(3px);
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .5s ease;
+    z-index:10;
+  }
+  .card-overlay.visible{
+    opacity:1;
+    pointer-events:auto;
+  }
+
+  .card{
+    position:relative;
+    width:min(480px, 100%);
+    max-height:85vh;
+    overflow-y:auto;
+    background:var(--card-bg);
+    border:2px solid var(--card-border);
+    border-radius:22px;
+    padding:clamp(28px,5vw,48px);
+    box-shadow:0 30px 60px -10px rgba(107,44,76,.45);
+    transform:translateY(50px) scale(.85);
+    transition:transform .6s cubic-bezier(.2,.8,.3,1.2);
+  }
+  .card-overlay.visible .card{
+    transform:translateY(0) scale(1);
+  }
+
+  .close-btn{
+    position:absolute;
+    top:14px; right:14px;
+    width:34px; height:34px;
+    border-radius:50%;
+    border:none;
+    background:var(--card-border);
+    color:var(--plum);
+    font-size:16px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .close-btn:hover{ background:var(--accent); color:#fff; }
+  .close-btn:focus-visible{ outline:3px solid var(--accent); outline-offset:2px; }
+
+  .card h1{
+    font-family:'Caveat', cursive;
+    font-weight:700;
+    font-size:clamp(34px,7vw,52px);
+    line-height:1.15;
+    margin:4px 0 22px;
+    text-align:center;
+    color:var(--accent);
+  }
+  .card h1 .name{
+    display:block;
+    color:var(--plum);
+    font-size:1.15em;
+  }
+
+  .message p{
+    font-size:clamp(15px,3.6vw,17px);
+    line-height:1.7;
+    margin:0 0 16px;
+  }
+
+  .signature{
+    font-family:'Caveat', cursive;
+    font-size:clamp(24px,5vw,30px);
+    color:var(--accent);
+    text-align:right;
+    margin:24px 0 0;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .floaty{ animation:none; display:none; }
+    .seal{ animation:none; }
+    .envelope-flap, .card, .card-overlay, .envelope-wrap{ transition:none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="scene">
+  <div class="floaties" id="floaties"></div>
+
+  <div class="envelope-wrap" id="envelopeWrap">
+    <p class="prompt">Tap the seal, AAI 💌</p>
+    <div class="envelope" id="envelope">
+      <div class="envelope-body"></div>
+      <div class="envelope-pocket"></div>
+      <div class="envelope-flap"></div>
+      <button class="seal" id="sealBtn" aria-label="Open the birthday card">💗</button>
+    </div>
+  </div>
+
+  <div class="card-overlay" id="cardOverlay">
+    <div class="card" id="card">
+      <button class="close-btn" id="closeBtn" aria-label="Close card">✕</button>
+      <div class="card-inner">
+        <h1>💖🎉 HAPPY BIRTHDAY<span class="name">AAI! 🎂🌸</span></h1>
+        <div class="message">
+          <p>I can't earn anything right now, so I made this because this is the only thing I know how to do at the moment. 🥹💝</p>
+          <p>Once I get a good job, I promise I'll make sure to get you something really special. 💼✨🎁</p>
+          <p>Please accept this for now. 🙏❤️</p>
+          <p>Love you, Aai! 🤗💕🌹</p>
+        </div>
+        <p class="signature">— From Tannu ❤️</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const envelopeWrap = document.getElementById('envelopeWrap');
+  const envelope = document.getElementById('envelope');
+  const sealBtn = document.getElementById('sealBtn');
+  const cardOverlay = document.getElementById('cardOverlay');
+  const closeBtn = document.getElementById('closeBtn');
+  const floaties = document.getElementById('floaties');
+
+  const EMOJI = ['💗','🌸','✨','💕','🌷','💖'];
+
+  // Ambient background floaties
+  function spawnAmbient(count){
+    for(let i=0;i<count;i++){
+      const el = document.createElement('span');
+      el.className = 'floaty';
+      el.textContent = EMOJI[Math.floor(Math.random()*EMOJI.length)];
+      el.style.left = Math.random()*100 + 'vw';
+      const duration = 10 + Math.random()*10;
+      el.style.animationDuration = duration + 's';
+      el.style.animationDelay = (-Math.random()*duration) + 's';
+      el.style.fontSize = (16 + Math.random()*16) + 'px';
+      floaties.appendChild(el);
+    }
+  }
+  spawnAmbient(14);
+
+  // Confetti burst on open
+  function burst(){
+    for(let i=0;i<20;i++){
+      const el = document.createElement('span');
+      el.className = 'floaty';
+      el.textContent = EMOJI[Math.floor(Math.random()*EMOJI.length)];
+      el.style.left = (35 + Math.random()*30) + 'vw';
+      el.style.bottom = '0';
+      el.style.top = 'auto';
+      const duration = 3 + Math.random()*2.5;
+      el.style.animationDuration = duration + 's';
+      el.style.animationDelay = (Math.random()*0.4) + 's';
+      el.style.fontSize = (18 + Math.random()*14) + 'px';
+      floaties.appendChild(el);
+      setTimeout(()=> el.remove(), (duration+1)*1000);
+    }
+  }
+
+  function openCard(){
+    envelope.classList.add('open');
+    setTimeout(()=>{
+      envelopeWrap.classList.add('hidden');
+      cardOverlay.classList.add('visible');
+      burst();
+    }, 650);
+  }
+
+  function closeCard(){
+    cardOverlay.classList.remove('visible');
+    setTimeout(()=>{
+      envelopeWrap.classList.remove('hidden');
+      envelope.classList.remove('open');
+    }, 400);
+  }
+
+  sealBtn.addEventListener('click', openCard);
+  closeBtn.addEventListener('click', closeCard);
+  cardOverlay.addEventListener('click', (e)=>{
+    if(e.target === cardOverlay) closeCard();
+  });
+  document.addEventListener('keydown', (e)=>{
+    if(e.key === 'Escape' && cardOverlay.classList.contains('visible')) closeCard();
+  });
+</script>
+
+</body>
+</html>
